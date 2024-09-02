@@ -88,7 +88,7 @@ add_annotations_to_yaml() {
 		info "Issue #7765: adding annotations to ${resource_kind} from ${yaml_file} is not implemented yet"
 		;;
 
-	ConfigMap|LimitRange|Namespace|PersistentVolume|PersistentVolumeClaim|RuntimeClass|Secret|Service)
+	ConfigMap|LimitRange|Namespace|PersistentVolume|PersistentVolumeClaim|PriorityClass|RuntimeClass|Secret|Service)
 		info "Annotations are not required for ${resource_kind} from ${yaml_file}"
 		;;
 
@@ -110,6 +110,7 @@ add_cbl_mariner_kernel_initrd_annotations() {
 
 		for K8S_TEST_YAML in runtimeclass_workloads_work/*.yaml
 		do
+			add_annotations_to_yaml "${K8S_TEST_YAML}" "${mariner_annotation_kernel}" "${mariner_kernel_path}"
 			add_annotations_to_yaml "${K8S_TEST_YAML}" "${mariner_annotation_initrd}" "${mariner_initrd_path}"
 		done
 	fi

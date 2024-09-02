@@ -198,6 +198,7 @@ type agent struct {
 	Tracing             bool     `toml:"enable_tracing"`
 	DebugConsoleEnabled bool     `toml:"debug_console_enabled"`
 	DialTimeout         uint32   `toml:"dial_timeout"`
+	CdhApiTimeout       uint32   `toml:"cdh_api_timeout"`
 }
 
 func (orig *tomlConfig) Clone() tomlConfig {
@@ -734,6 +735,10 @@ func (a agent) debugConsoleEnabled() bool {
 
 func (a agent) dialTimout() uint32 {
 	return a.DialTimeout
+}
+
+func (a agent) cdhApiTimout() uint32 {
+	return a.CdhApiTimeout
 }
 
 func (a agent) debug() bool {
@@ -1336,11 +1341,13 @@ func newStratovirtHypervisorConfig(h hypervisor) (vc.HypervisorConfig, error) {
 }
 
 func newRemoteHypervisorConfig(h hypervisor) (vc.HypervisorConfig, error) {
+	machineType := h.machineType()
 
 	return vc.HypervisorConfig{
 		RemoteHypervisorSocket:  h.getRemoteHypervisorSocket(),
 		RemoteHypervisorTimeout: h.getRemoteHypervisorTimeout(),
 		DisableGuestSeLinux:     true, // The remote hypervisor has a different guest, so Guest SELinux config doesn't work
+		HypervisorMachineType:   machineType,
 		SharedFS:                config.NoSharedFS,
 
 		// No valid value so avoid to append block device to list in kata_agent.appendDevices
@@ -1415,6 +1422,7 @@ func updateRuntimeConfigAgent(configPath string, tomlConf tomlConfig, config *oc
 			KernelModules:      agent.kernelModules(),
 			EnableDebugConsole: agent.debugConsoleEnabled(),
 			DialTimeout:        agent.dialTimout(),
+			CdhApiTimeout:      agent.cdhApiTimout(),
 		}
 	}
 
